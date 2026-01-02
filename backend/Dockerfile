@@ -8,7 +8,7 @@ RUN useradd -m appuser
 WORKDIR /app
 
 COPY --from=builder /root/.local /home/appuser/.local
-COPY . .
+COPY . .   # <-- this MUST include tests/
 
 ENV PATH=/home/appuser/.local/bin:$PATH
 USER appuser

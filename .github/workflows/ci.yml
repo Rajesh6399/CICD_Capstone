@@ -15,7 +15,8 @@ jobs:
         run: docker build -t backend-test ./backend
 
       - name: Run tests
-        run: docker run backend-test pytest tests/
+        run: docker run backend-test pytest -p no:cacheprovider
+
 
       - name: Trivy Scan
         uses: aquasecurity/trivy-action@master
