@@ -1,0 +1,35 @@
+name: CI-CD Pipeline
+
+on:
+  push:
+    branches: [develop, staging, main]
+
+jobs:
+  build-test-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t backend-test ./backend
+
+      - name: Run tests
+        run: docker run backend-test pytest tests/
+
+      - name: Trivy Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: backend-test
+
+      - name: Push Image
+        run: |
+          docker tag backend-test myrepo/backend:${{ github.sha }}
+          docker push myrepo/backend:${{ github.sha }}
+
+  deploy:
+    needs: build-test-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        run: bash scripts/deploy.sh dev
